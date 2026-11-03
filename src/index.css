@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #007aba;
+    --color-surface: #0a0f1d;
+    --color-card: #111827;
+  }
+
+  body {
+    background-color: #080d19;
+    color: #e2e8f0;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom medical viewer crosshair cursor */
+  .cursor-crosshair-medical {
+    cursor: crosshair;
+  }
+
+  /* Custom dark scrollbars for clinical displays */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #007aba;
+  }
+}
+
+/* 3D viewport canvas styles */
+.webgl-container {
+  touch-action: none;
+}
+
+/* Subtle glow utilities */
+.glow-danger {
+  box-shadow: 0 0 20px -2px rgba(220, 53, 69, 0.4);
+}
+.glow-warning {
+  box-shadow: 0 0 20px -2px rgba(245, 158, 11, 0.4);
+}
+.glow-success {
+  box-shadow: 0 0 20px -2px rgba(16, 185, 129, 0.4);
+}
+.glow-medical {
+  box-shadow: 0 0 20px -2px rgba(0, 122, 186, 0.4);
+}
