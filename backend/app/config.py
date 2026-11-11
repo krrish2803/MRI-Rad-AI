@@ -37,7 +37,10 @@ class Settings(BaseSettings):
     nnunet_results: Path | None = Field(default=None, validation_alias="nnUNet_results")
 
     model_config = SettingsConfigDict(
-        env_file=".env", extra="ignore", case_sensitive=False
+        env_file=".env",
+        env_ignore_empty=True,
+        extra="ignore",
+        case_sensitive=False,
     )
 
     @property
