@@ -93,6 +93,9 @@ def test_analysis_poll_and_feedback_contract(client, image_bytes, monkeypatch):
         == "Research prototype. Not for clinical use. Requires radiologist review."
     )
     assert "lesions" not in result
+    image_review = client.get(f"/api/v1/image-reviews/{analysis_id}").json()
+    assert image_review["review_id"] == analysis_id
+    assert image_review["observations"][0]["technical_observation"] == "Readable."
     for feedback_type in ("agree", "disagree", "needs_review"):
         feedback_response = client.post(
             f"/api/v1/analyses/{analysis_id}/feedback",
@@ -153,6 +156,19 @@ def test_missing_nvidia_key_fails_fast(client, image_bytes, monkeypatch):
     assert response.status_code == 503
 
 
+def test_zone_jobs_contract_uses_expected_multipart_fields(client, monkeypatch):
+    monkeypatch.setattr(routes, "zone_model_status", lambda settings: "trained_model_missing")
+    response = client.post(
+        "/api/v1/zone-jobs",
+        files={
+            "t2": ("t2.nii.gz", b"nifti", "application/gzip"),
+            "adc": ("adc.nii.gz", b"nifti", "application/gzip"),
+        },
+    )
+    assert response.status_code == 503
+    assert "five trained folds" in response.json()["error"]["message"]
+
+
 def test_health_reports_database_and_vlm(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -161,3 +177,5 @@ def test_health_reports_database_and_vlm(client):
     assert "/api/v1/uploads" in openapi["paths"]
     assert "/api/v1/analyses/{analysis_id}" in openapi["paths"]
     assert "/api/v1/zone-segmentations" in openapi["paths"]
+    assert "/api/v1/zone-jobs" in openapi["paths"]
+    assert "/api/v1/image-reviews/{review_id}" in openapi["paths"]

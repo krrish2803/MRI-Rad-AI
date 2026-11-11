@@ -295,6 +295,23 @@ def get_analysis(analysis_id: UUID):
     return _analysis_response(doc)
 
 
+@router.get("/api/v1/image-reviews/{review_id}")
+def get_image_review(review_id: str):
+    """Expose the technical image observations using the research-page contract."""
+    try:
+        parsed_id = UUID(review_id)
+    except ValueError as exc:
+        raise HTTPException(404, "Image review not found.") from exc
+    analysis = get_analysis(parsed_id)
+    result = analysis.get("result") or {}
+    return {
+        "review_id": analysis["analysis_id"],
+        "status": analysis["status"],
+        "error_message": analysis.get("error_message"),
+        "observations": result.get("image_observations", []),
+    }
+
+
 @router.get("/api/v1/analyses")
 def list_analyses(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
     _db_guard()
@@ -313,6 +330,65 @@ def list_analyses(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, g
     return {"items": items, "limit": limit, "offset": offset}
 
 
+def _feedback_response(doc: dict[str, Any] | None) -> dict[str, Any]:
+    if not doc:
+        return {"feedback": None}
+    return {
+        "feedback": {
+            "feedback_id": doc.get("feedback_id"),
+            "feedback_type": doc.get("feedback_type"),
+            "notes": doc.get("notes", ""),
+            "updated_at": doc.get("updated_at", doc.get("created_at")).isoformat()
+            if doc.get("updated_at", doc.get("created_at"))
+            else None,
+        }
+    }
+
+
+def _save_feedback(
+    resource_type: str, resource_id: str, body: FeedbackCreate
+) -> dict[str, Any]:
+    if body.feedback_type == "zone_boundary_issue" and not body.zone_name:
+        raise HTTPException(
+            422, "zone_name (PZ or TZ) is required for a zone boundary issue."
+        )
+    now = datetime.now(UTC)
+    identity = {"resource_type": resource_type, "resource_id": resource_id}
+    feedback().update_one(
+        identity,
+        {
+            "$set": {
+                "feedback_type": body.feedback_type.value,
+                "zone_name": body.zone_name,
+                "notes": body.notes,
+                "updated_at": now,
+            },
+            "$setOnInsert": {
+                "feedback_id": str(uuid4()),
+                **identity,
+                "analysis_id": resource_id if resource_type == "image_review" else None,
+                "created_at": now,
+            },
+        },
+        upsert=True,
+    )
+    return _feedback_response(feedback().find_one(identity))
+
+
+def _get_feedback(resource_type: str, resource_id: str) -> dict[str, Any]:
+    return _feedback_response(
+        feedback().find_one({"resource_type": resource_type, "resource_id": resource_id})
+    )
+
+
+@router.get("/api/v1/analyses/{analysis_id}/feedback")
+def get_analysis_feedback(analysis_id: UUID):
+    _db_guard()
+    if not analyses().find_one({"analysis_id": str(analysis_id)}):
+        raise HTTPException(404, "Analysis not found.")
+    return _get_feedback("image_review", str(analysis_id))
+
+
 @router.post("/api/v1/analyses/{analysis_id}/feedback", status_code=201)
 def create_feedback(analysis_id: UUID, body: FeedbackCreate):
     _db_guard()
@@ -321,20 +397,45 @@ def create_feedback(analysis_id: UUID, body: FeedbackCreate):
         raise HTTPException(404, "Analysis not found.")
     if analysis["status"] != "completed":
         raise HTTPException(409, "Feedback is accepted only after analysis completes.")
-    if body.feedback_type == "zone_boundary_issue" and not body.zone_name:
-        raise HTTPException(
-            422, "zone_name (PZ or TZ) is required for a zone boundary issue."
-        )
-    record = {
-        "feedback_id": str(uuid4()),
-        "analysis_id": str(analysis_id),
-        "feedback_type": body.feedback_type.value,
-        "zone_name": body.zone_name,
-        "notes": body.notes,
-        "created_at": datetime.now(UTC),
-    }
-    feedback().insert_one(record)
-    return {"feedback_id": record["feedback_id"], "status": "saved"}
+    return _save_feedback("image_review", str(analysis_id), body)
+
+
+@router.get("/api/v1/image-reviews/{review_id}/feedback")
+def get_image_review_feedback(review_id: str):
+    try:
+        parsed_id = str(UUID(review_id))
+    except ValueError as exc:
+        raise HTTPException(404, "Image review not found.") from exc
+    return get_analysis_feedback(UUID(parsed_id))
+
+
+@router.post("/api/v1/image-reviews/{review_id}/feedback", status_code=201)
+def save_image_review_feedback(review_id: str, body: FeedbackCreate):
+    try:
+        parsed_id = str(UUID(review_id))
+    except ValueError as exc:
+        raise HTTPException(404, "Image review not found.") from exc
+    return create_feedback(UUID(parsed_id), body)
+
+
+@router.get("/api/v1/zone-jobs/{job_id}/feedback")
+def get_zone_job_feedback(job_id: UUID):
+    _db_guard()
+    job = zone_segmentations().find_one({"segmentation_id": str(job_id)})
+    if not job:
+        raise HTTPException(404, "Zone job not found.")
+    return _get_feedback("zone_job", str(job_id))
+
+
+@router.post("/api/v1/zone-jobs/{job_id}/feedback", status_code=201)
+def save_zone_job_feedback(job_id: UUID, body: FeedbackCreate):
+    _db_guard()
+    job = zone_segmentations().find_one({"segmentation_id": str(job_id)})
+    if not job:
+        raise HTTPException(404, "Zone job not found.")
+    if job["status"] != "completed":
+        raise HTTPException(409, "Feedback is accepted only after segmentation completes.")
+    return _save_feedback("zone_job", str(job_id), body)
 
 
 @router.post("/api/v1/zone-segmentations", status_code=202)
@@ -436,3 +537,56 @@ def get_zone_mask(segmentation_id: UUID):
     return FileResponse(
         mask_path, media_type="application/gzip", filename="prostate_zone_mask.nii.gz"
     )
+
+
+def _research_job_status(status: str) -> str:
+    return {
+        "pending": "queued",
+        "processing": "running",
+        "completed": "completed",
+        "failed": "failed",
+        "cancelled": "cancelled",
+    }.get(status, "failed")
+
+
+def _zone_model_info() -> dict[str, Any]:
+    return {
+        "model": "nnU-Net v2 3d_fullres",
+        "folds": 5,
+        "dataset": "MSD Task05 Prostate",
+        "training_cases": 32,
+    }
+
+
+@router.post("/api/v1/zone-jobs", status_code=202)
+async def create_zone_job(
+    background_tasks: BackgroundTasks,
+    t2: UploadFile = File(...),  # noqa: B008
+    adc: UploadFile = File(...),  # noqa: B008
+):
+    """Compatibility route for the analysis UI's zone-job contract."""
+    result = await create_zone_segmentation(
+        background_tasks, t2_file=t2, adc_file=adc
+    )
+    return {
+        "job_id": result["segmentation_id"],
+        "status": _research_job_status(result["status"]),
+        "model_info": _zone_model_info(),
+    }
+
+
+@router.get("/api/v1/zone-jobs/{job_id}")
+def get_zone_job(job_id: UUID):
+    job = get_zone_segmentation(job_id)
+    return {
+        "job_id": job["segmentation_id"],
+        "status": _research_job_status(job["status"]),
+        "error_message": job.get("error_message"),
+        "warnings": job.get("warnings", []),
+        "model_info": _zone_model_info(),
+    }
+
+
+@router.get("/api/v1/zone-jobs/{job_id}/mask")
+def get_zone_job_mask(job_id: UUID):
+    return get_zone_mask(job_id)

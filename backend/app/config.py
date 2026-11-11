@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     mongodb_database: str = "mriradai"
     storage_dir: Path = Path("./storage")
     nvidia_api_key: str | None = None
-    nvidia_model: str = "moonshotai/kimi-k2.5"
+    nvidia_model: str = "nvidia/nemotron-3.5-super-vl-120b-a12b"
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     nvidia_timeout_seconds: int = 120
     nvidia_max_retries: int = 3

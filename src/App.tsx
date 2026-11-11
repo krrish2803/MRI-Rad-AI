@@ -120,12 +120,7 @@ export function App() {
         )}
 
         {currentTab === 'analysis' && (
-          <AnalysisDashboard
-            patient={selectedCase}
-            onUpdatePatient={handleUpdatePatient}
-            onSwitchCase={handleSwitchCase}
-            allCases={cases}
-          />
+          <AnalysisDashboard />
         )}
 
         {currentTab === 'dashboard' && (

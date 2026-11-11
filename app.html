@@ -1,42 +1,14 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#10211f" />
-  <title>Research workspace · MRI-RadAI</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/landing.css" />
-  <link rel="stylesheet" href="/workspace.css" />
-  <link rel="stylesheet" href="/workspace-backend.css" />
-</head>
-<body class="workspace-body">
-  <header class="topbar"><a class="brand" href="/"><span class="brand-icon">M</span><span><b>MRI-RadAI</b><small>RESEARCH WORKSPACE</small></span></a><a class="text-link dark-link" href="/">← Back to overview</a></header>
-  <main class="workspace container">
-    <div class="workspace-heading"><p class="eyebrow dark"><i></i> IMAGE REVIEW · RESEARCH PROTOTYPE</p><h1>Review images<br /><em>with context.</em></h1><p>Upload 1–3 DICOM, PNG, or JPEG files and tag their sequence. DICOM images are converted to windowed grayscale slices. NVIDIA returns technical image-quality observations only.</p></div>
-    <section class="upload-card">
-      <label class="file-drop" for="scan-files"><span class="upload-symbol">＋</span><b>Choose MRI files</b><small>DICOM, PNG, or JPEG · up to 50 MB per file</small><input id="scan-files" type="file" accept=".dcm,image/png,image/jpeg" multiple /></label>
-      <div id="file-list" class="file-list" aria-live="polite"></div>
-      <button id="upload-button" class="button button-primary" type="button" disabled>Upload selected files <span>→</span></button>
-      <p class="workspace-error" id="error-message" role="alert"></p>
-      <h2 class="subheading">Ready uploads</h2>
-      <div id="uploads-list" class="uploads-list"><p class="muted">No files uploaded yet.</p></div>
-      <button id="analyze-button" class="button button-primary" type="button" disabled>Start image-quality review <span>→</span></button>
-    </section>
-    <section class="result-card" id="result-card" hidden aria-live="polite">
-      <div class="result-top"><div><p class="eyebrow dark"><i></i> ANALYSIS STATUS</p><h2 id="analysis-status">Pending</h2></div><span class="status-pill" id="status-pill">PENDING</span></div>
-      <p id="progress-message" class="muted">The analysis runs in the background. This page checks for updates every two seconds.</p>
-      <div id="analysis-output" hidden><p id="analysis-summary"></p><div id="image-quality"></div><label class="slice-picker" for="slice-select">Review source slice <select id="slice-select"></select></label><img id="slice-preview" class="slice-preview" alt="Selected normalized grayscale MRI slice" /><div id="observation-list"></div>
-        <form id="feedback-form" class="feedback-box"><h3>Record research feedback</h3><label for="feedback-type">Feedback</label><select id="feedback-type"><option value="agree">Agree</option><option value="disagree">Disagree</option><option value="needs_review">Needs review</option><option value="zone_boundary_issue">Zone boundary issue</option></select><label for="zone-name">Zone (for boundary issue)</label><select id="zone-name"><option value="">Not applicable</option><option value="PZ">Peripheral zone (PZ)</option><option value="TZ">Transition zone (TZ)</option></select><label for="feedback-note">Note</label><textarea id="feedback-note" rows="3" maxlength="2000" placeholder="Record a research review note"></textarea><button class="button button-primary" type="submit">Save feedback</button><p id="feedback-message" aria-live="polite"></p></form>
-      </div>
-      <p class="usage-foot" id="usage-foot"></p>
-    </section>
-    <section class="history-card"><h2 class="subheading">Recent analyses</h2><div id="history-list" class="muted">Loading history…</div></section>
-    <section class="upload-card zone-card"><p class="eyebrow dark"><i></i> 3D ANATOMY MODEL</p><h2 class="subheading">Segment prostate zones</h2><p class="muted">Provide co-registered 3D T2 and ADC NIfTI volumes. nnU-Net v2 returns a mask for peripheral zone (PZ) and transition zone (TZ). This model does not detect cancer or lesions. It requires the trained five-fold model to be installed locally.</p><form id="zone-form"><label>T2 volume (.nii.gz)<input id="zone-t2" type="file" accept=".nii.gz,application/gzip" required /></label><label>ADC volume (.nii.gz)<input id="zone-adc" type="file" accept=".nii.gz,application/gzip" required /></label><button class="button button-primary" type="submit">Run zone segmentation <span>→</span></button></form><p id="zone-status" class="workspace-error" role="status"></p><a id="zone-mask-link" hidden download href="">Download PZ/TZ mask</a></section>
-    <p class="workspace-disclaimer">Research prototype only. Not for clinical use. The NVIDIA service reports technical image quality only; it does not make diagnoses or detect lesions. nnU-Net segments prostate anatomy zones (PZ/TZ) only. Do not upload identifiable patient information.</p>
-  </main>
-  <script type="module" src="/workspace.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080d19" />
+    <meta name="description" content="MRI-RadAI research analysis workspace for prostate zone segmentation and technical image quality review." />
+    <title>MRI-RadAI · Research analysis</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/analysis-main.tsx"></script>
+  </body>
 </html>

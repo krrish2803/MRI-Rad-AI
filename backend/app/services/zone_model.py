@@ -23,7 +23,7 @@ def zone_model_status(settings=None) -> str:
     settings = settings or get_settings()
     if not shutil.which(settings.nnunet_predict_command):
         return "predictor_not_installed"
-    results_path = settings.nnunet_results or os.environ.get("nnUNet_results")
+    results_path = os.environ.get("nnUNet_results") or settings.nnunet_results
     if not results_path:
         return "results_path_missing"
     dataset_name = f"Dataset{settings.nnunet_dataset_id:03d}_Prostate"
