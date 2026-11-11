@@ -44,7 +44,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DISCLAIMER = "Research prototype only. Not for clinical use. A qualified radiologist must review original imaging and patient context."
+DISCLAIMER = ("Research prototype only; not for clinical use. This image description does not detect cancer or lesions. "
+              "The separate nnU-Net experiment is intended to segment prostate anatomy zones (PZ/TZ) only. "
+              "A qualified radiologist must review original imaging and patient context.")
 ALLOWED_TYPES = {"image/png": "png", "image/jpeg": "jpg"}
 
 

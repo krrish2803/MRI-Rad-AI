@@ -14,7 +14,7 @@
 <body class="workspace-body">
   <header class="topbar"><a class="brand" href="/"><span class="brand-icon">M</span><span><b>MRI-RadAI</b><small>RESEARCH WORKSPACE</small></span></a><a class="text-link dark-link" href="/">← Back to overview</a></header>
   <main class="workspace container">
-    <div class="workspace-heading"><p class="eyebrow dark"><i></i> IMAGE REVIEW · RESEARCH PROTOTYPE</p><h1>Explore an image<br /><em>with the model.</em></h1><p>Upload 1–3 PNG or JPEG images. The NVIDIA model returns a limited visual description. It does not diagnose or produce PI-RADS scores.</p></div>
+    <div class="workspace-heading"><p class="eyebrow dark"><i></i> IMAGE REVIEW · RESEARCH PROTOTYPE</p><h1>Explore an image<br /><em>with the model.</em></h1><p>Upload 1–3 PNG or JPEG images for a limited NVIDIA vision-model description. The separate nnU-Net experiment is intended to segment prostate anatomy zones only; neither model detects cancer or produces PI-RADS scores.</p></div>
     <form id="analysis-form" class="upload-card">
       <label class="file-drop" for="scan-files"><span class="upload-symbol">＋</span><b>Choose MRI image files</b><small>PNG or JPEG · up to 50 MB each · maximum 3 images</small><input id="scan-files" name="files" type="file" accept="image/png,image/jpeg" multiple required /></label>
       <div id="file-list" class="file-list" aria-live="polite"></div>
@@ -26,7 +26,7 @@
       <pre id="analysis-result"></pre>
       <div class="feedback-box" id="feedback-box" hidden><label for="feedback-note">Review note (optional)</label><textarea id="feedback-note" rows="3" maxlength="2000" placeholder="Record a research review note"></textarea><div><button type="button" data-feedback="agree">Agree</button><button type="button" data-feedback="disagree">Disagree</button><button type="button" data-feedback="needs_review">Needs review</button></div><p id="feedback-message"></p></div>
     </section>
-    <p class="workspace-disclaimer">Research prototype only. Not for clinical use. Do not upload identifiable patient information. A qualified radiologist must review the original DICOM study and clinical context.</p>
+    <p class="workspace-disclaimer">Research prototype only. The current upload endpoint does not run the nnU-Net zone-segmentation model. Anatomy segmentation describes peripheral and transition zones only; there are no cancer lesion labels in the training data. Not for clinical use. Do not upload identifiable patient information.</p>
   </main>
   <script type="module" src="/workspace.js"></script>
 </body>

@@ -12,8 +12,9 @@ MRI-RadAI is a college research prototype for exploring a prostate MRI review wo
 - Background analysis call using NVIDIA's OpenAI-compatible chat completions endpoint and a vision-capable model.
 - Feedback actions: agree, disagree, or needs review.
 - Existing Task05 prostate zone-segmentation baseline and experiment report under `experiments/`.
+- Reproducible nnU-Net v2 3D full-resolution conversion, five-fold training, and fold-level Dice evaluation instructions under `experiments/nnunet/`.
 
-The Task05 experiment labels prostate peripheral and transition zones; it does not provide cancer lesion labels. Its model should not be presented as cancer detection.
+The Task05 experiment labels prostate peripheral and transition zones; it does not provide cancer lesion labels. Its model should not be presented as cancer detection. The nnU-Net workflow is prepared, but five-fold training has not been run in this environment because the dataset is not present locally and this Mac has no NVIDIA CUDA GPU. The current upload API does not call the nnU-Net model.
 
 ## Run locally
 
