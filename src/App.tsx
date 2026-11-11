@@ -154,7 +154,7 @@ export function App() {
       />
 
       {/* Footer */}
-      {currentTab !== 'analysis' && <Footer />}
+      {currentTab !== 'analysis' && currentTab !== 'landing' && <Footer />}
     </div>
   );
 }

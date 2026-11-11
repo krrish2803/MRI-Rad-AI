@@ -1,96 +1,71 @@
-# MRI-RadAI: AI-Powered Prostate Lesion Detection & 3D Decision Support
+# MRI-RadAI
 
-[![React 18](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://react.dev)
-[![Three.js](https://img.shields.io/badge/Three.js-WebGL2-black.svg)](https://threejs.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v3.4-38bdf8.svg)](https://tailwindcss.com)
-[![PI-RADS](https://img.shields.io/badge/PI--RADS-v2.1%20Adherent-emerald.svg)](https://www.acr.org/Clinical-Resources/Reporting-and-Data-Systems/PI-RADS)
-[![HIPAA Compliant](https://img.shields.io/badge/HIPAA-PS%203.15%20De--identified-teal.svg)](#security--compliance)
+MRI-RadAI is a college research prototype for exploring a prostate MRI review workflow. The public landing page and upload screen use plain HTML, CSS, and JavaScript. A small FastAPI service stores uploaded image files and analysis/feedback records in MongoDB and can send image prompts to NVIDIA's hosted vision API.
 
-A clinical-grade decision-support platform for radiologists and medical professionals that combines **Claude Vision VLM multi-modal reasoning** (T2-weighted, DWI high b-value, ADC maps) with **interactive 3D anatomical volume visualization** using Three.js.
+**This is not a diagnostic system.** The NVIDIA response is an experimental visual description of a few image files, not an interpretation of a complete MRI study. Do not use it for patient care or upload identifiable patient information. A qualified radiologist must review original DICOM images and clinical context.
 
----
+## Implemented
 
-## 🌟 Clinical Reality & Solution
+- Premium static landing page describing the problem, product concept, workflow, audience, FAQs, and limitations.
+- Local upload and status screen for 1–3 PNG/JPEG images (50 MB maximum each).
+- MongoDB persistence: image bytes in GridFS, analysis state and research feedback in collections.
+- Background analysis call using NVIDIA's OpenAI-compatible chat completions endpoint and a vision-capable model.
+- Feedback actions: agree, disagree, or needs review.
+- Existing Task05 prostate zone-segmentation baseline and experiment report under `experiments/`.
 
-- **The Problem:** Radiologists spend 45–120 minutes per patient manually evaluating multi-parametric MRI exams. Specialists disagree 15–25% of the time on subtle peripheral zone lesions, and black-box CNN tools fail to explain why a region is flagged.
-- **The Solution:** MRI-RadAI acts as a tireless fellowship-level decision-support assistant—reducing turnaround time to **5–10 minutes**, explaining every detection in natural clinical lexicon, and providing true 3D spatial orientation.
+The Task05 experiment labels prostate peripheral and transition zones; it does not provide cancer lesion labels. Its model should not be presented as cancer detection.
 
----
+## Run locally
 
-## 🚀 Key Features
+Requirements: Node.js/npm, Docker Compose, and an NVIDIA API key from the NVIDIA API catalog.
 
-### 1. Interactive 3D Medical Workstation (`Three.js` + `@react-three/fiber`)
-- **Anatomical Prostate Organ Reconstruction:** 
-  - Fibrous Prostatic Capsule
-  - Peripheral Zone (PZ - apex, mid-gland, base where ~70-75% of cancers originate)
-  - Transition Zone (TZ - bilateral lobes around the urethra)
-  - Urethra Lumen pathway with emissive glow
-  - Neurovascular bundles on posterior-lateral borders
-- **Dynamic Axial Cutting Plane:** Synchronously shifts through the 3D organ volume as the user scrubs through slices.
-- **Volumetric Lesions:**
-  - Color-coded by PI-RADS v2.1 risk (Red = Category 4-5 High Risk; Yellow = Category 3 Equivocal; Green = Category 1-2 Benign).
-  - Emissive pulsing animation & confidence gradient uncertainty halo.
-  - Interactive selection: Clicking a lesion in 3D highlights it, shows metrics, and jumps to the exact slice in the 2D viewer.
-- **Viewpoint Presets & Layer Controls:** Superior (Axial), Anterior (Coronal), Lateral (Sagittal), 3D Isometric, Transparency slider, and Wireframe toggle.
+1. Install front-end dependencies:
 
-### 2. Multi-Planar 2D MPR Slice Viewer
-- **Multi-Modal Sequences:** T2-weighted TSE, High b-value Diffusion (DWI b-2000), and Quantitative ADC Map.
-- **Synchronized Crosshairs & Cine Playback:** Smooth scrub loop with adjustable frame rates.
-- **Radiologist Manual Annotation:** Interactive tool allowing physicians to click and drop target ROIs and manual lesion contours.
+   ```bash
+   npm install
+   ```
 
-### 3. Explainable Claude Vision VLM Findings Panel
-- **Multi-Modal Reasoning Narrative:** Transparent natural language explanations distinguishing adenocarcinoma from atypical BPH nodules and prostatitis.
-- **Quantitative Radiomics:** Dimensions (length, width, volume cc), nadir ADC value (e.g. $0.64 \times 10^{-3} \text{ mm}^2/\text{s}$), and Extraprostatic Extension (EPE) risk assessment.
-- **Confidence Gauge & PI-RADS v2.1 Scoring:** Category 1 to 5 visual metrics.
+2. Configure the backend environment:
 
-### 4. Radiologist Feedback Loop & Active Learning
-- **Approve / Reject (False Positive) / Modify** buttons for each detected lesion.
-- **Diagnostic Impression & Biopsy Directive** notes.
-- **Electronic Sign-Off** with board certification badge and timestamp.
+   ```bash
+   cp backend/.env.example .env
+   ```
 
-### 5. Medical-Grade Export Suite
-- **One-Click Clinical PDF Report:** Built with `jsPDF`, formatted with institutional letterhead, patient demographics, multi-parametric findings table, PI-RADS scoring, Claude VLM narrative, and radiologist digital signature.
-- **Quantitative Metrics CSV Export:** Export dimensions, coordinates, ADC metrics, and validation states.
-- **Encrypted De-Identified Case Sharing:** Generate secure consultation links for tumor boards.
+   Set `NVIDIA_API_KEY` in `.env`. The default model is `moonshotai/kimi-k2.5`; `NVIDIA_MODEL` can be changed if availability differs for your account. Do not commit `.env`.
 
-### 6. Hospital PACS Worklist & Case Archive
-- Track turnaround times, concordance rates, and filter by risk / review status.
-- Pre-loaded PROSTATEx benchmark cases (PX-4092, PX-1028, PX-2291, PX-5014) representing diverse clinical scenarios.
+3. Start MongoDB and the API:
 
-### 7. Comprehensive FAQ & Settings
-- Full 20-question clinical and technical knowledge base covering HIPAA, PACS DICOMweb integration, pricing, and validation.
+   ```bash
+   docker compose up --build
+   ```
 
----
+4. In another terminal, start the vanilla front end:
 
-## 🛠️ Tech Stack
+   ```bash
+   npm run dev
+   ```
 
-- **Framework:** React 18, TypeScript, Vite
-- **3D Engine:** Three.js, `@react-three/fiber`, `@react-three/drei`
-- **Styling:** Tailwind CSS, Lucide React
-- **Export Engine:** `jsPDF`
-- **Clinical Protocols:** PI-RADS v2.1, DICOM PS 3.15 De-Identification
+   Open the Vite URL (usually `http://localhost:3000`). The UI proxies `/api` requests to `http://localhost:8000`. API docs are at `http://localhost:8000/docs`; health check is `/api/health`.
 
----
+Alternatively, run the Python API directly: `python -m venv .venv`, activate it, `pip install -r backend/requirements.txt`, then `uvicorn app.main:app --app-dir backend --reload --port 8000`. MongoDB must be running and accessible at `MONGODB_URI`.
 
-## 💻 Getting Started
+## NVIDIA integration
 
-### Installation
-```bash
-npm install
-```
+The service calls `POST https://integrate.api.nvidia.com/v1/chat/completions`. The endpoint is OpenAI-compatible; the NVIDIA vision model accepts image content in chat messages. NVIDIA's current API model documentation and image format are subject to change, so configure `NVIDIA_MODEL` for a vision model enabled for your account. See [NVIDIA LLM API reference](https://docs.api.nvidia.com/nim/reference/llm-apis) and [Kimi K2.5 image input format](https://docs.api.nvidia.com/nim/reference/moonshotai-kimi-k2-5-infer).
 
-### Development Server
-```bash
-npm run dev
-# Starts on http://localhost:3000
-```
+## Current boundaries
 
-### Production Build
-```bash
-npm run build
-```
+- Upload accepts PNG/JPEG only. DICOM, NIfTI, multi-slice series, preprocessing, PACS, authentication, and clinical deployment are not implemented.
+- The model is asked not to diagnose, assign PI-RADS, or recommend treatment, but generated text can still be wrong.
+- Uploads are stored in local MongoDB GridFS without production encryption, access controls, retention policies, or de-identification. Use synthetic or properly de-identified research images only.
+- The landing page's anatomy and case preview are illustrative. The Task05 baseline model is a separate zone-segmentation experiment and is not connected to the upload analysis API.
+- The legacy React/Three.js prototype remains in `src/`; the landing and upload flows are vanilla HTML/CSS/JS as requested.
 
----
+## Repository contents
 
-## 🏥 Clinical Disclaimer
-MRI-RadAI is engineered as an investigational Clinical Decision Support software instrument. All final diagnostic readings, biopsy directives, and oncological treatments must be independently verified by a board-certified radiologist or physician.
+- `index.html`, `landing.css`, `landing-more.css`, `landing.js`: static landing page.
+- `app.html`, `workspace.css`, `workspace.js`: image upload/research review flow.
+- `backend/app/main.py`: FastAPI, MongoDB, GridFS, NVIDIA API, and feedback endpoints.
+- `docker-compose.yml`: local MongoDB and API containers.
+- `experiments/`: Task05 baseline code and outputs.
+- `MRI-RadAI_Build_Brief-2.pdf`: supplied project build brief.

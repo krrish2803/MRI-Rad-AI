@@ -1,0 +1,52 @@
+{
+  "task": "MSD Task05 Prostate anatomical zone segmentation",
+  "classes": {
+    "1": "peripheral zone (PZ)",
+    "2": "transition zone (TZ)"
+  },
+  "architecture": "2D U-Net, T2+ADC input, 160x160 slices",
+  "seed": 41,
+  "epochs": 8,
+  "train_patients": [
+    0,
+    1,
+    2,
+    6,
+    7,
+    10,
+    13,
+    14,
+    16,
+    17,
+    18,
+    20,
+    24,
+    25,
+    28,
+    29,
+    31,
+    32,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44,
+    47
+  ],
+  "validation_patients": [
+    4,
+    21,
+    34,
+    35,
+    40,
+    46
+  ],
+  "best_validation_epoch": 8,
+  "validation_dice_pz": 0.4850075893443744,
+  "validation_dice_tz": 0.7138663380489683,
+  "validation_mean_dice": 0.5994369636966713,
+  "elapsed_seconds": 124.9,
+  "limitations": "Small internal patient-level split; no cancer lesion labels; not clinical validation."
+}

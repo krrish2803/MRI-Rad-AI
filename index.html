@@ -1,17 +1,90 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007ABA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M22 12h-4l-3 9L9 3l-3 9H2'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MRI-RadAI | Clinical 3D Prostate MRI Lesion Detection & Decision Support</title>
-    <meta name="description" content="AI-powered prostate lesion detection platform for radiologists with explainable VLM reasoning, 3D anatomical volume visualization, and clinical reporting." />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#10211f" />
+    <meta name="description" content="MRI-RadAI is a prostate MRI review workspace prototype connecting findings, slice views and 3D anatomy." />
+    <title>MRI-RadAI — See the finding in context</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/landing.css" />
+    <link rel="stylesheet" href="/landing-more.css" />
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased min-h-screen selection:bg-medical-500 selection:text-white">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="MRI-RadAI home"><span class="brand-icon">M</span><span><b>MRI-RadAI</b><small>PROSTATE MRI WORKSPACE</small></span></a>
+      <nav class="nav-links" id="nav-links" aria-label="Main navigation"><a href="#challenge">Why MRI-RadAI</a><a href="#features">Product</a><a href="#workflow">Workflow</a><a href="#faq">FAQ</a></nav>
+      <button class="nav-cta" data-demo>Explore sample case <span>↗</span></button>
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero-glow"></div><div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><i></i> PROSTATE MRI · CLINICAL DECISION SUPPORT</p>
+            <h1>Read the finding.<br /><em>See where it lives.</em></h1>
+            <p class="lead">A more connected way to review prostate MRI findings—bringing lesion details, slice views, and 3D anatomy into one clinician-led workspace.</p>
+            <div class="hero-actions"><a class="button button-primary" href="#workflow">Explore the workflow <span>↗</span></a><button class="button button-quiet" data-demo>Open a sample case <span>→</span></button></div>
+            <p class="prototype-note"><span></span>Prototype experience using sample data. Not for clinical diagnosis.</p>
+          </div>
+
+          <div class="preview-wrap" aria-label="Illustration of MRI-RadAI workspace">
+            <div class="preview-card">
+              <div class="preview-head"><div class="preview-brand"><span class="mini-mark">M</span> Review workspace</div><span class="demo-pill"><i></i> DEMO CASE</span></div>
+              <div class="case-row"><div><small>CASE OVERVIEW</small><strong>Prostate MRI <i>·</i> PX-4092</strong></div><span class="score-pill">PI-RADS <b>5</b></span></div>
+              <div class="view-grid">
+                <div class="scan-panel"><div class="panel-label">T2 AXIAL <span id="slice-count">14 / 28</span></div><svg class="scan-art" viewBox="0 0 300 240" aria-label="Stylized sample MRI slice"><defs><radialGradient id="body"><stop stop-color="#586a64"/><stop offset="1" stop-color="#172522"/></radialGradient><radialGradient id="gland"><stop stop-color="#a9b4a0"/><stop offset=".7" stop-color="#60736a"/><stop offset="1" stop-color="#2a413a"/></radialGradient><filter id="soft"><feGaussianBlur stdDeviation="8"/></filter></defs><ellipse cx="150" cy="123" rx="132" ry="102" fill="url(#body)" stroke="#819087" stroke-opacity=".35"/><ellipse cx="150" cy="123" rx="76" ry="60" fill="url(#gland)" stroke="#c3cbb7" stroke-opacity=".6" stroke-width="2"/><ellipse cx="150" cy="123" rx="29" ry="34" fill="#344740" stroke="#aab7a6" stroke-opacity=".5"/><path d="M92 125c22-28 44-38 62-31 17 5 32 21 48 40-21 22-45 34-63 28-20-5-35-21-47-37Z" fill="#dc9a73" opacity=".45" filter="url(#soft)"/><ellipse cx="105" cy="114" rx="10" ry="8" fill="#e4aa83" stroke="#ffe1bd" stroke-width="2"/><circle cx="105" cy="114" r="22" fill="none" stroke="#f2c09b" stroke-dasharray="3 4"/><path d="M18 123h264M150 18v210" stroke="#d5ded0" stroke-opacity=".2" stroke-dasharray="4 5"/></svg><div class="scan-foot"><span>R</span><span>— 20 mm —</span><span>L</span></div></div>
+                <div class="model-panel"><div class="panel-label">3D ANATOMY <span>ROTATE</span></div><svg class="model-art" viewBox="0 0 190 220" aria-label="Stylized 3D prostate anatomy"><defs><radialGradient id="organ" cx="32%" cy="24%"><stop stop-color="#d0b996"/><stop offset="1" stop-color="#675c4d"/></radialGradient><linearGradient id="zone" x2="1" y2="1"><stop stop-color="#b4c9ae"/><stop offset="1" stop-color="#5d8573"/></linearGradient></defs><path d="M93 19c-23 3-36 23-34 50-18 20-30 51-22 81 6 24 25 39 49 36 10 12 25 16 39 7 25 4 43-13 47-38 5-29-7-59-25-80 0-31-17-52-40-56-5-6-10-7-14 0Z" fill="url(#organ)" stroke="#ddcdb0" stroke-opacity=".75"/><path d="M91 45c-18 2-28 18-28 38-13 17-20 40-13 59 5 15 17 23 31 19 10 7 22 8 32 1 16 2 28-9 31-24 4-20-4-42-17-56-1-21-12-34-26-36-4-3-7-3-10-1Z" fill="url(#zone)"/><path d="M96 56c-1 21 4 39 1 59-2 17 1 29 4 42" stroke="#e5d9bf" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M67 99c14-9 21-10 30-8s18 10 24 20c-12 14-23 20-35 18-10-2-17-11-19-30Z" fill="#dc9571" stroke="#f0c1a0"/><circle cx="82" cy="109" r="16" fill="none" stroke="#ffe0c1" stroke-dasharray="2 3"/><text x="12" y="98" fill="#d6c7ac" font-size="9">PZ</text><text x="142" y="66" fill="#d6c7ac" font-size="9">TZ</text></svg><div class="legend"><span><i></i> Selected finding</span><span><i></i> Anatomy</span></div></div>
+              </div>
+              <div class="finding-row"><div class="selected-finding"><i></i><span><small>SELECTED FINDING</small><b>Target lesion · Mid-gland PZ</b></span></div><div><small>SIZE</small><b>16.4 × 12.1 <small>mm</small></b></div><div><small>CONFIDENCE</small><b>96<small>%</small></b></div><div><small>ADC</small><b>0.64 <small>×10⁻³</small></b></div></div>
+              <div class="preview-footnote">◈ Illustrative interface · Sample case data</div>
+            </div>
+            <div class="floating-note"><span>✓</span><b>Radiologist-led</b><small>Review and sign-off</small></div>
+          </div>
+        </div>
+        <div class="hero-bottom"><span>BUILT AROUND THE READING WORKFLOW</span><div><span>◎ Spatial context</span><span>▤ Multi-planar review</span><span>✳ Clinician in control</span></div></div>
+      </section>
+
+      <section class="section problem" id="challenge"><div class="container"><div class="section-title challenge-title"><p class="eyebrow dark"><i></i> THE PROBLEM · THE RESPONSE</p><h2>One finding. Several views.<br />A lot to keep in mind.</h2><p>Prostate MRI review means comparing sequences, tracking a region across slices, and turning observations into a clear clinical impression.</p></div><div class="challenge-grid"><article class="challenge-card"><span class="card-index">01 / THE CHALLENGE</span><h3>Context gets fragmented</h3><p>Sequence views, lesion notes, anatomy, and review decisions can live in different places. That makes it harder to keep the whole case in view.</p><ul><li>Compare T2, diffusion, and ADC findings</li><li>Stay oriented across slice positions</li><li>Record why a region needs attention</li></ul></article><div class="challenge-connector">↓</div><article class="challenge-card solution-card"><span class="card-index">02 / THE MRI-RADAI APPROACH</span><h3>Keep the review connected</h3><p>MRI-RadAI brings case context, illustrative slice and anatomy views, sample findings, and clinician review actions together in one workspace concept.</p><ul><li>Inspect a finding beside its slice context</li><li>Relate markers to a prostate anatomy model</li><li>Capture review feedback and export a summary</li></ul></article></div><p class="section-caveat">The current experience is a research prototype using bundled sample cases and synthetic viewer imagery.</p></div></section>
+
+      <section class="section features" id="features"><div class="container"><div class="section-title"><p class="eyebrow dark"><i></i> ONE WORKSPACE, FOUR LENSES</p><h2>From signal to spatial context.</h2><p>Designed to make each part of a case easier to inspect and discuss.</p></div><div class="feature-grid">
+        <article><span class="feature-meta">01 <b>⌗</b></span><h3>A clearer spatial picture</h3><p>Explore a procedural prostate model, select lesion markers, and relate them to surrounding anatomy.</p><i class="accent-line"></i></article>
+        <article><span class="feature-meta">02 <b>▧</b></span><h3>A familiar reading rhythm</h3><p>Browse axial, sagittal, and coronal views, change sequence styling, and step through slices.</p><i class="accent-line"></i></article>
+        <article><span class="feature-meta">03 <b>◉</b></span><h3>Findings with a rationale</h3><p>Review sample lesion characteristics, scores, measurements, and written explanations together.</p><i class="accent-line"></i></article>
+        <article><span class="feature-meta">04 <b>＋</b></span><h3>Clinician stays in control</h3><p>Approve, reject, or modify a finding, add a manual ROI, and mark a case as reviewed.</p><i class="accent-line"></i></article>
+      </div></div></section>
+
+      <section class="section product-detail"><div class="container product-grid"><div class="product-copy"><p class="eyebrow dark"><i></i> THE PRODUCT EXPERIENCE</p><h2>A case review, from first look to final note.</h2><p>Think of MRI-RadAI as a case desk: start with a study, inspect the relevant views, examine the sample finding, and record the human review.</p><a class="text-link dark-link" href="#workflow">See the review flow <span>→</span></a></div><div class="product-stages"><article><span class="stage-icon">01</span><div><small>CASE INTAKE</small><h3>Bring the study into view</h3><p>Choose a sample case or explore the upload flow. The intended product accepts sequences tagged by type.</p></div></article><article><span class="stage-icon">02</span><div><small>IMAGE REVIEW</small><h3>Move through the slices</h3><p>Use the 2D viewer controls to change plane, series, slice, and annotation overlay in the prototype.</p></div></article><article><span class="stage-icon">03</span><div><small>FINDING REVIEW</small><h3>Understand the candidate</h3><p>Keep sample lesion location, zone, characteristics, measurements, and written rationale together.</p></div></article><article><span class="stage-icon">04</span><div><small>CLINICIAN ACTION</small><h3>Record your review</h3><p>Approve, reject, or modify a sample finding, add an ROI annotation, and export case details.</p></div></article></div></div></section>
+
+      <section class="section workflow" id="workflow"><div class="container workflow-grid"><div class="workflow-intro"><p class="eyebrow"><i></i> A SIMPLE REVIEW LOOP</p><h2>One case.<br /><em>A connected view.</em></h2><p>Move from case context to anatomy, then capture the clinician’s review and export a clear summary.</p><button class="text-link" data-demo>Walk through a sample case <span>→</span></button></div><div class="steps">
+        <article><span>01</span><i>⌕</i><div><h3>Choose a case</h3><p>Start with a sample case or explore the local upload workflow.</p></div><b>↓</b></article>
+        <article><span>02</span><i>◇</i><div><h3>Review in context</h3><p>Move between synthetic 2D slices and a rotatable 3D anatomy view.</p></div><b>↓</b></article>
+        <article><span>03</span><i>✓</i><div><h3>Make the call</h3><p>Select findings, add ROI annotations, and record your review.</p></div><b>↓</b></article>
+        <article><span>04</span><i>↗</i><div><h3>Share the report</h3><p>Export a case summary as a PDF or lesion metrics as a CSV.</p></div><b>·</b></article>
+      </div></div></section>
+
+      <section class="section value"><div class="container value-panel"><div><p class="eyebrow dark"><i></i> WHY IT’S USEFUL</p><h2>Less switching.<br /><em>More seeing.</em></h2><p class="value-copy">For radiologists and clinical teams, the value is a calmer review surface: findings sit beside their imaging context, anatomy, notes, and next action.</p><ul><li>✓ Keep lesion details close to the slice</li><li>✓ Orient findings in a 3D view</li><li>✓ Capture review decisions in context</li></ul></div><aside><span>✳</span><small>ONE LINE</small><blockquote>“A prostate MRI review workspace that connects the finding to the anatomy—and keeps the clinician in control.”</blockquote><b>MRI-RADAI · PRODUCT PRINCIPLE</b></aside></div></section>
+
+      <section class="section audience"><div class="container"><div class="section-title"><p class="eyebrow dark"><i></i> MADE FOR THE PEOPLE IN THE LOOP</p><h2>Useful at every review handoff.</h2><p>A shared picture of the case helps each role focus on the question in front of them.</p></div><div class="audience-grid"><article><span>01</span><h3>Radiologists</h3><p>Review the image context, inspect candidate regions, and document agreement or correction.</p></article><article><span>02</span><h3>Urology teams</h3><p>Discuss findings with a concise location and rationale available alongside the case summary.</p></article><article><span>03</span><h3>Research teams</h3><p>Explore a prototype workflow and evaluate approaches using appropriately labeled public datasets.</p></article></div><p class="section-caveat">These are intended users for the product concept. The prototype does not connect to clinical systems or support patient care.</p></div></section>
+
+      <section class="section faq" id="faq"><div class="container faq-grid"><div><p class="eyebrow dark"><i></i> GOOD TO KNOW</p><h2>Questions, answered plainly.</h2><p>Clear expectations about what this prototype demonstrates today.</p></div><div class="faq-list">
+        <details open><summary>What is MRI-RadAI?<span>⌄</span></summary><p>MRI-RadAI is a front-end prototype for a prostate MRI review workflow. It demonstrates a worklist, sample cases, interactive 2D and 3D views, radiologist feedback, and report exports.</p></details>
+        <details><summary>Can I analyze a real MRI scan here?<span>⌄</span></summary><p>The research workspace accepts 1–3 PNG or JPEG images and sends them to a configured NVIDIA vision model. This is a limited image description flow, not a complete DICOM study analysis or diagnostic model.</p></details>
+        <details><summary>Are the images and measurements from real scans?<span>⌄</span></summary><p>No. The viewer draws procedural example graphics and displays bundled sample case values. They are for product demonstration only, not clinical interpretation.</p></details>
+        <details><summary>Does this connect to PACS or NVIDIA?<span>⌄</span></summary><p>The local research workspace can call NVIDIA's hosted vision API after you configure an API key. PACS, DICOMweb, authentication, and clinical system integrations are not included.</p></details>
+        <details><summary>What does the research dataset contain?<span>⌄</span></summary><p>The small Task05 dataset used for the baseline contains T2 and ADC prostate MRI volumes with peripheral-zone and transition-zone segmentation labels. It does not contain cancer-lesion labels. It is separate from the synthetic graphics shown in this landing-page preview.</p></details>
+        <details><summary>What is planned for a working MVP?<span>⌄</span></summary><p>The build brief prioritizes a local backend for image upload, slice preparation, analysis status, structured findings, and clinician feedback. 3D, PACS, authentication, and PDF reporting are later phases.</p></details>
+        <details><summary>Can this be used for patient care?<span>⌄</span></summary><p>No. This prototype is not a diagnostic device and its sample content must not be used for patient care. Clinical decisions require qualified review of original imaging and patient context.</p></details>
+      </div></div></section>
+
+      <section class="final-cta"><div class="container final-inner"><div><p class="eyebrow"><i></i> TAKE A CLOSER LOOK</p><h2>Explore the workflow.<br /><em>See the case in context.</em></h2><p>Try the sample experience and move through the review workspace at your own pace.</p></div><button class="button button-light" data-demo>Open the sample case <span>→</span></button><div class="orbit"></div></div></section>
+    </main>
+
+    <footer class="footer"><div class="container"><span>◇ &nbsp; RESEARCH PROTOTYPE</span><p>MRI-RadAI uses sample data and synthetic viewer graphics. The research workspace can submit PNG/JPEG images to NVIDIA's hosted vision API when configured. Not for clinical use or patient care.</p><a href="#top">Back to top ↑</a></div></footer>
+    <dialog class="demo-dialog"><button class="dialog-close" aria-label="Close">×</button><p class="eyebrow dark"><i></i> RESEARCH WORKSPACE</p><h2>Explore an image.</h2><p>Open the local upload flow to submit up to three PNG or JPEG images for a limited visual description. The result is not a diagnosis.</p><a class="button button-primary" href="/app.html">Open workspace <span>→</span></a></dialog>
+    <script type="module" src="/landing.js"></script>
   </body>
 </html>
