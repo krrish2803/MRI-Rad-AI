@@ -33,6 +33,13 @@ nnUNetv2_convert_MSD_dataset -i /path/to/Task05_Prostate
 nnUNetv2_plan_and_preprocess -d 5 --verify_dataset_integrity
 ```
 
+To measure only fold 0 first, or run all folds after reviewing that timing, use the helper (from the repository root):
+
+```bash
+bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate fold0
+bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate all
+```
+
 Confirm `Dataset005_Prostate/dataset.json` names channel 0 `T2`, channel 1 `ADC`, and labels 1 `PZ`, 2 `TZ` before training. The nnU-Net converter is the source of the dataset formatting; do not manually merge or reorder channels.
 
 ## Train and measure

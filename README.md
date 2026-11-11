@@ -1,81 +1,94 @@
 # MRI-RadAI
 
-MRI-RadAI is a college research prototype for exploring a prostate MRI review workflow. The public landing page and upload screen use plain HTML, CSS, and JavaScript. A small FastAPI service stores uploaded image files and analysis/feedback records in MongoDB and can send image prompts to NVIDIA's hosted vision API.
+MRI-RadAI is a local research prototype for prostate MRI image quality review and prostate-zone segmentation. Its public landing page and workspace use plain HTML, CSS, and JavaScript. The API uses FastAPI, MongoDB, local image storage, NVIDIA NIM for technical image-quality observations, and an optional nnU-Net v2 inference runner for zone masks.
 
-**This is not a diagnostic system.** The NVIDIA response is an experimental visual description of a few image files, not an interpretation of a complete MRI study. Do not use it for patient care or upload identifiable patient information. A qualified radiologist must review original DICOM images and clinical context.
+**This is not a diagnostic system.** The NVIDIA API is explicitly restricted to technical image quality and does not return lesion or cancer findings. The nnU-Net model segments peripheral zone (PZ) and transition zone (TZ) anatomy only. Task05 has no cancer lesion labels. Do not use this system for patient care or upload identifiable patient information.
 
-## Implemented
+## Backend features
 
-- Premium static landing page describing the problem, product concept, workflow, audience, FAQs, and limitations.
-- Local upload and status screen for 1–3 PNG/JPEG images (50 MB maximum each).
-- MongoDB persistence: image bytes in GridFS, analysis state and research feedback in collections.
-- Background analysis call using NVIDIA's OpenAI-compatible chat completions endpoint and a vision-capable model.
-- Feedback actions: agree, disagree, or needs review.
-- Existing Task05 prostate zone-segmentation baseline and experiment report under `experiments/`.
-- Reproducible nnU-Net v2 3D full-resolution conversion, five-fold training, and fold-level Dice evaluation instructions under `experiments/nnunet/`.
+- `POST /api/v1/uploads`: magic-byte validation for DICOM, PNG, and JPEG; per-file size limit; DICOM rescale/windowing; grayscale PNG slices; server-generated storage paths; duplicate detection by SHA-256 and sequence.
+- `GET /api/v1/uploads/{id}` and `GET /api/v1/uploads/{id}/slices/{index}`: upload metadata and PNG slice previews.
+- `POST /api/v1/analyses`: choose one to three distinct sequences and selected/default slices, create a background job, and return its ID.
+- `GET /api/v1/analyses/{id}` and `GET /api/v1/analyses`: polling and recent history.
+- NVIDIA NIM vision call: technical image-quality summary only, structured JSON validation, one repair attempt, retry handling, usage and optional cost accounting.
+- `POST /api/v1/analyses/{id}/feedback`: save research feedback (`agree`, `disagree`, `needs_review`, or a PZ/TZ boundary issue).
+- `POST /api/v1/zone-segmentations`: accept co-registered T2 and ADC 3D NIfTI volumes, invoke nnU-Net v2 using all five folds, and save a PZ/TZ mask. This requires the trained model and nnU-Net predictor to be installed locally.
+- `GET /api/v1/zone-segmentations/{id}` and `/mask`: poll and download the resulting NIfTI anatomy mask.
+- MongoDB collections: `uploads`, `analyses`, `feedback`, and `zone_segmentations`. Normalized slices and NIfTI inputs/outputs are stored under `STORAGE_DIR`; MongoDB holds metadata and job results.
+- OpenAPI/Swagger: `http://localhost:8000/docs`; health: `http://localhost:8000/health`.
 
-The Task05 experiment labels prostate peripheral and transition zones; it does not provide cancer lesion labels. Its model should not be presented as cancer detection. The nnU-Net workflow is prepared, but five-fold training has not been run in this environment because the dataset is not present locally and this Mac has no NVIDIA CUDA GPU. The current upload API does not call the nnU-Net model.
+## Run locally (no Docker)
 
-## Run locally
+Requirements: Python 3.11 or newer, Node.js/npm, MongoDB Community running locally or MongoDB Atlas, and an NVIDIA API key. The API uses `MONGODB_URI` to connect to MongoDB.
 
-Requirements: Node.js/npm, Python 3.11+, a local MongoDB service or MongoDB Atlas URI, and an NVIDIA API key from the NVIDIA API catalog.
-
-1. Install front-end dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Create and activate a Python virtual environment, then install the API dependencies:
+1. Create the Python environment and install dependencies:
 
    ```bash
-   python3 -m venv .venv
+   python3.12 -m venv .venv
    source .venv/bin/activate
    pip install -r backend/requirements.txt
    ```
 
-3. Configure the backend environment:
+2. Copy local settings and set your NVIDIA key:
 
    ```bash
    cp backend/.env.example .env
    ```
 
-   Set `NVIDIA_API_KEY` in `.env`; update `MONGODB_URI` if you use MongoDB Atlas. The default model is `moonshotai/kimi-k2.5`; set `NVIDIA_MODEL` if availability differs for your account. Do not commit `.env`.
+   Set `NVIDIA_API_KEY` in `.env`; leave pricing unset unless you have confirmed current per-token rates. The default model is configurable with `NVIDIA_MODEL`. Do not commit `.env`.
 
-4. Start MongoDB using your operating system's MongoDB service manager, or use a MongoDB Atlas connection URI in `MONGODB_URI`.
+3. Start the local MongoDB service using your operating system's service manager. On macOS with the MongoDB Community formula installed, use `brew services start mongodb-community`. For MongoDB Atlas, put its URI in `MONGODB_URI` instead.
 
-5. Start the API in the activated virtual environment:
+4. Start the API:
 
    ```bash
    uvicorn app.main:app --app-dir backend --reload --port 8000
    ```
 
-6. In another terminal, start the vanilla front end:
+5. In another terminal, start the static frontend:
 
    ```bash
+   npm install
    npm run dev
    ```
 
-   Open the Vite URL (usually `http://localhost:3000`). The UI proxies `/api` requests to `http://localhost:8000`. API docs are at `http://localhost:8000/docs`; health check is `/api/health`.
+   Open the Vite URL shown in the terminal (normally `http://localhost:3000`). Vite proxies `/api` to the local API.
 
-MongoDB must be running and accessible at `MONGODB_URI` before creating an analysis.
+## Train nnU-Net v2 on MSD Task05
 
-## NVIDIA integration
+The separate reproducible training instructions are in [`experiments/nnunet/README.md`](experiments/nnunet/README.md). They convert MSD Task05 to nnU-Net v2 format, plan/preprocess, train `3d_fullres` folds 0–4, and calculate per-zone fold means and standard deviations. The model predicts background, PZ, and TZ only.
 
-The service calls `POST https://integrate.api.nvidia.com/v1/chat/completions`. The endpoint is OpenAI-compatible; the NVIDIA vision model accepts image content in chat messages. NVIDIA's current API model documentation and image format are subject to change, so configure `NVIDIA_MODEL` for a vision model enabled for your account. See [NVIDIA LLM API reference](https://docs.api.nvidia.com/nim/reference/llm-apis) and [Kimi K2.5 image input format](https://docs.api.nvidia.com/nim/reference/moonshotai-kimi-k2-5-infer).
+When running the backend zone-mask endpoint, activate the nnU-Net environment or set `NNUNET_PREDICT_COMMAND` to its `nnUNetv2_predict` executable. Set the same `nnUNet_raw`, `nnUNet_preprocessed`, and `nnUNet_results` paths used for training. The inference route runs only after predictor installation and trained fold checkpoints are available.
+
+## Test the backend
+
+Install dev/test requirements and run the offline suite:
+
+```bash
+pip install -r backend/requirements-dev.txt
+pytest --cov=app.services --cov-report=term-missing --cov-fail-under=70
+ruff check backend/app backend/tests
+black --check backend/app backend/tests
+```
+
+Tests use mocked NVIDIA and nnU-Net calls. They do not contact either external model service.
 
 ## Current boundaries
 
-- Upload accepts PNG/JPEG only. DICOM, NIfTI, multi-slice series, preprocessing, PACS, authentication, and clinical deployment are not implemented.
-- The model is asked not to diagnose, assign PI-RADS, or recommend treatment, but generated text can still be wrong.
-- Uploads are stored in local MongoDB GridFS without production encryption, access controls, retention policies, or de-identification. Use synthetic or properly de-identified research images only.
-- The landing page's anatomy and case preview are illustrative. The Task05 baseline model is a separate zone-segmentation experiment and is not connected to the upload analysis API.
-- The legacy React/Three.js prototype remains in `src/`; the landing and upload flows are vanilla HTML/CSS/JS as requested.
+- The hosted NVIDIA VLM returns technical image-quality observations only. It does not identify, locate, score, or characterize suspected cancer.
+- nnU-Net uses the MSD Task05 T2 and ADC channels and PZ/TZ masks. It does not output lesions or cancer predictions.
+- PNG/JPEG files are single-image inputs. DICOM multi-frame files become stacks; one-slice DICOM is one slice. Patient identifiers from DICOM headers are not stored. Original DICOM files are discarded unless `KEEP_ORIGINAL_DICOM=true`.
+- The nnU-Net endpoint requires a co-registered T2/ADC NIfTI pair. It is independent of the image-quality analysis route.
+- Upload storage is local and unauthenticated. This prototype has no production encryption, access controls, retention policy, or clinical validation. It is not HIPAA-compliant.
+- This machine currently has no local Task05 dataset and no NVIDIA CUDA GPU, and `NVIDIA_API_KEY` is not configured. Thus no nnU-Net fold metrics or live NVIDIA analysis results have been produced here.
+- The landing-page anatomy preview remains illustrative. It is not a prediction from the trained model.
 
-## Repository contents
+## Repository map
 
-- `index.html`, `landing.css`, `landing-more.css`, `landing.js`: static landing page.
-- `app.html`, `workspace.css`, `workspace.js`: image upload/research review flow.
-- `backend/app/main.py`: FastAPI, MongoDB, GridFS, NVIDIA API, and feedback endpoints.
-- `experiments/`: Task05 baseline code and outputs.
-- `MRI-RadAI_Build_Brief-2.pdf`: supplied project build brief.
+- `index.html`, `landing*.css`, `landing.js`: static landing page.
+- `app.html`, `workspace*.css`, `workspace.js`: upload, analysis status, review, feedback, and zone-mask UI.
+- `backend/app/`: FastAPI API, MongoDB, DICOM/image pipeline, NVIDIA client, NIfTI validation, nnU-Net runner.
+- `backend/tests/`: mocked API and service tests.
+- `experiments/nnunet/`: nnU-Net v2 training and CV evaluation workflow.
+- `experiments/msd_prostate_baseline.py`: earlier small 2D baseline, retained for comparison only.
+- `MRI-RadAI_Build_Brief-2.pdf`: supplied project brief.

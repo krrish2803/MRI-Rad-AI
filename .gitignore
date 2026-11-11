@@ -30,4 +30,11 @@ dist-ssr
 .venv*
 __pycache__/
 *.py[cod]
+.coverage
+htmlcov/
 .nnunet/
+storage/
+experiments/nnunet/logs/
+experiments/nnunet/results/
+*.nii
+*.nii.gz
