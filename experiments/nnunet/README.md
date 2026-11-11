@@ -13,7 +13,7 @@ The original MSD NIfTI volumes already contain the modalities and labels, but nn
 
 ## Setup without Docker
 
-Use Python 3.10 or newer. Install a PyTorch build matching the machine first, then install nnU-Net v2. For an NVIDIA GPU, install the matching CUDA-enabled PyTorch build. nnU-Net recommends a GPU with at least 10 GB VRAM for training; Apple's MPS does not currently support nnU-Net's 3D convolutions, so Apple Silicon may fall back to CPU.
+Use Python 3.10 or newer. Install a PyTorch build matching the machine first, then install nnU-Net v2. For an NVIDIA GPU, install the matching CUDA-enabled PyTorch build. nnU-Net recommends a GPU with at least 10 GB VRAM for training. The MPS device is available on Apple Silicon, but this Task05 3D full-resolution run did not complete its first epoch after more than seven minutes on an M4 laptop, so a full five-fold run is not practical on that machine.
 
 Set paths to writable local folders. Keep the downloaded dataset and training outputs outside Git:
 
@@ -36,9 +36,11 @@ nnUNetv2_plan_and_preprocess -d 5 --verify_dataset_integrity
 To measure only fold 0 first, or run all folds after reviewing that timing, use the helper (from the repository root):
 
 ```bash
-bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate fold0
-bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate all
+NNUNET_DEVICE=cuda bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate fold0
+NNUNET_DEVICE=cuda bash experiments/nnunet/train_cv.sh /path/to/Task05_Prostate all
 ```
+
+On Apple Silicon, set `NNUNET_DEVICE=mps` to attempt training on Metal. On a CPU-only machine, use `NNUNET_DEVICE=cpu`; expect substantially longer training times.
 
 Confirm `Dataset005_Prostate/dataset.json` names channel 0 `T2`, channel 1 `ADC`, and labels 1 `PZ`, 2 `TZ` before training. The nnU-Net converter is the source of the dataset formatting; do not manually merge or reorder channels.
 

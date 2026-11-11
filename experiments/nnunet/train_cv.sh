@@ -17,6 +17,7 @@ if [[ -z "${nnUNet_raw:-}" || -z "${nnUNet_preprocessed:-}" || -z "${nnUNet_resu
 fi
 
 dataset="Dataset005_Prostate"
+device="${NNUNET_DEVICE:-cuda}"
 dataset_raw="$nnUNet_raw/$dataset"
 mkdir -p "$nnUNet_raw" "$nnUNet_preprocessed" "$nnUNet_results" experiments/nnunet/logs
 
@@ -29,8 +30,8 @@ run_fold() {
   local fold="$1"
   local stamp
   stamp="$(date +%Y%m%d-%H%M%S)"
-  echo "Starting nnU-Net v2 3d_fullres fold $fold at $(date -Iseconds)"
-  /usr/bin/time -p nnUNetv2_train 5 3d_fullres "$fold" --npz 2>&1 | tee "experiments/nnunet/logs/fold-${fold}-${stamp}.log"
+  echo "Starting nnU-Net v2 3d_fullres fold $fold on $device at $(date -Iseconds)"
+  /usr/bin/time -p nnUNetv2_train 5 3d_fullres "$fold" -device "$device" --npz 2>&1 | tee "experiments/nnunet/logs/fold-${fold}-${stamp}.log"
   echo "Finished fold $fold at $(date -Iseconds)"
 }
 
