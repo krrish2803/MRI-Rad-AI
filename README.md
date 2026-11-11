@@ -17,7 +17,7 @@ The Task05 experiment labels prostate peripheral and transition zones; it does n
 
 ## Run locally
 
-Requirements: Node.js/npm, Docker Compose, and an NVIDIA API key from the NVIDIA API catalog.
+Requirements: Node.js/npm, Python 3.11+, a local MongoDB service or MongoDB Atlas URI, and an NVIDIA API key from the NVIDIA API catalog.
 
 1. Install front-end dependencies:
 
@@ -25,21 +25,31 @@ Requirements: Node.js/npm, Docker Compose, and an NVIDIA API key from the NVIDIA
    npm install
    ```
 
-2. Configure the backend environment:
+2. Create and activate a Python virtual environment, then install the API dependencies:
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r backend/requirements.txt
+   ```
+
+3. Configure the backend environment:
 
    ```bash
    cp backend/.env.example .env
    ```
 
-   Set `NVIDIA_API_KEY` in `.env`. The default model is `moonshotai/kimi-k2.5`; `NVIDIA_MODEL` can be changed if availability differs for your account. Do not commit `.env`.
+   Set `NVIDIA_API_KEY` in `.env`; update `MONGODB_URI` if you use MongoDB Atlas. The default model is `moonshotai/kimi-k2.5`; set `NVIDIA_MODEL` if availability differs for your account. Do not commit `.env`.
 
-3. Start MongoDB and the API:
+4. Start MongoDB using your operating system's MongoDB service manager, or use a MongoDB Atlas connection URI in `MONGODB_URI`.
+
+5. Start the API in the activated virtual environment:
 
    ```bash
-   docker compose up --build
+   uvicorn app.main:app --app-dir backend --reload --port 8000
    ```
 
-4. In another terminal, start the vanilla front end:
+6. In another terminal, start the vanilla front end:
 
    ```bash
    npm run dev
@@ -47,7 +57,7 @@ Requirements: Node.js/npm, Docker Compose, and an NVIDIA API key from the NVIDIA
 
    Open the Vite URL (usually `http://localhost:3000`). The UI proxies `/api` requests to `http://localhost:8000`. API docs are at `http://localhost:8000/docs`; health check is `/api/health`.
 
-Alternatively, run the Python API directly: `python -m venv .venv`, activate it, `pip install -r backend/requirements.txt`, then `uvicorn app.main:app --app-dir backend --reload --port 8000`. MongoDB must be running and accessible at `MONGODB_URI`.
+MongoDB must be running and accessible at `MONGODB_URI` before creating an analysis.
 
 ## NVIDIA integration
 
@@ -66,6 +76,5 @@ The service calls `POST https://integrate.api.nvidia.com/v1/chat/completions`. T
 - `index.html`, `landing.css`, `landing-more.css`, `landing.js`: static landing page.
 - `app.html`, `workspace.css`, `workspace.js`: image upload/research review flow.
 - `backend/app/main.py`: FastAPI, MongoDB, GridFS, NVIDIA API, and feedback endpoints.
-- `docker-compose.yml`: local MongoDB and API containers.
 - `experiments/`: Task05 baseline code and outputs.
 - `MRI-RadAI_Build_Brief-2.pdf`: supplied project build brief.
