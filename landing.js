@@ -46,3 +46,28 @@ document.querySelectorAll('.faq-list details').forEach((item) => {
     });
   });
 });
+
+const landingStatus = document.querySelector('#landing-live-status');
+const landingStatusRow = landingStatus?.closest('.snapshot-status');
+if (landingStatus) {
+  fetch('/api/v1/dashboard/stats', { cache: 'no-store' })
+    .then((response) => {
+      if (!response.ok) throw new Error('Backend unavailable');
+      return response.json();
+    })
+    .then((stats) => {
+      const trainingCases = document.querySelector('#landing-training-cases');
+      const meanDice = document.querySelector('#landing-baseline-dice');
+      if (trainingCases) trainingCases.textContent = String(stats.dataset?.training_cases ?? 32);
+      if (meanDice) meanDice.textContent = Number(stats.baseline?.dice?.mean ?? 0.599).toFixed(3);
+      const dbReady = stats.system?.database === 'ok';
+      landingStatus.textContent = dbReady
+        ? 'Backend and database connected'
+        : 'Backend connected · database unavailable';
+      landingStatusRow?.classList.add(dbReady ? 'is-ready' : 'is-error');
+    })
+    .catch(() => {
+      landingStatus.textContent = 'Backend unavailable · research baseline is shown';
+      landingStatusRow?.classList.add('is-error');
+    });
+}

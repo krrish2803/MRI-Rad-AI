@@ -9,7 +9,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(process.cwd(), 'index.html'),
-        workspace: resolve(process.cwd(), 'app.html')
+        workspace: resolve(process.cwd(), 'app.html'),
+        dashboard: resolve(process.cwd(), 'dashboard.html')
       }
     }
   },
@@ -28,7 +29,10 @@ export default defineConfig({
     port: 3000,
     host: true,
     open: false,
-    proxy: { '/api': 'http://localhost:8000' }
+    proxy: {
+      '/api': 'http://127.0.0.1:8000',
+      '/health': 'http://127.0.0.1:8000'
+    }
   },
   preview: {
     port: 3000,

@@ -19,7 +19,8 @@ MRI-RadAI is a research prototype for reviewing prostate MRI image quality and s
 
 | Path | Purpose |
 | --- | --- |
-| `index.html`, `landing*.css`, `landing.js` | Static landing page |
+| `index.html`, `landing*.css`, `landing.js` | Landing page with backend status snapshot and dashboard links |
+| `dashboard.html`, `dashboard.css`, `dashboard.js` | Research overview dashboard with live service/activity status and the saved 2D baseline metrics |
 | `app.html`, `src/` | React analysis workspace, API client, NIfTI checks, mocks, and text filtering |
 | `backend/app/` | FastAPI routes, MongoDB access, image normalization, NVIDIA calls, and nnU-Net inference |
 | `backend/tests/` | Backend API and service tests |
@@ -87,7 +88,7 @@ In a second terminal, from the repository root:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the landing page and [http://localhost:3000/app.html](http://localhost:3000/app.html) for the analysis workspace. Vite proxies `/api` requests to `http://localhost:8000`.
+Open [http://localhost:3000](http://localhost:3000) for the landing page, [http://localhost:3000/dashboard.html](http://localhost:3000/dashboard.html) for the research dashboard, and [http://localhost:3000/app.html](http://localhost:3000/app.html) for the analysis workspace. Vite proxies `/api` and `/health` requests to the FastAPI service on port 8000.
 
 ## Use mock mode
 

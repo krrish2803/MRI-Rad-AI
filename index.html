@@ -16,7 +16,7 @@
     <header class="topbar">
       <a class="brand" href="#top" aria-label="MRI-RadAI home"><span class="brand-icon">M</span><span><b>MRI-RadAI</b><small>PROSTATE MRI WORKSPACE</small></span></a>
       <nav class="nav-links" id="nav-links" aria-label="Main navigation"><a href="#challenge">Why MRI-RadAI</a><a href="#features">Product</a><a href="#workflow">Workflow</a><a href="#faq">FAQ</a></nav>
-      <button class="nav-cta" data-demo>Explore sample case <span>↗</span></button>
+      <a class="nav-cta" href="/dashboard.html">Explore workspace <span>↗</span></a>
       <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
     </header>
 
@@ -27,7 +27,7 @@
             <p class="eyebrow"><i></i> PROSTATE MRI · CLINICAL DECISION SUPPORT</p>
             <h1>Read the finding.<br /><em>See where it lives.</em></h1>
             <p class="lead">A more connected way to review prostate MRI findings—bringing lesion details, slice views, and 3D anatomy into one clinician-led workspace.</p>
-            <div class="hero-actions"><a class="button button-primary" href="#workflow">Explore the workflow <span>↗</span></a><button class="button button-quiet" data-demo>Open a sample case <span>→</span></button></div>
+            <div class="hero-actions"><a class="button button-primary" href="/dashboard.html">Explore workspace <span>↗</span></a><button class="button button-quiet" data-demo>Open a sample case <span>→</span></button></div>
             <p class="prototype-note"><span></span>Prototype experience using sample data. Not for clinical diagnosis.</p>
           </div>
 
@@ -46,6 +46,13 @@
           </div>
         </div>
         <div class="hero-bottom"><span>BUILT AROUND THE READING WORKFLOW</span><div><span>◎ Spatial context</span><span>▤ Multi-planar review</span><span>✳ Clinician in control</span></div></div>
+        <div class="landing-snapshot" aria-label="Live research dashboard snapshot">
+          <div class="snapshot-intro"><small>RESEARCH SNAPSHOT</small><b>Built from the local dataset</b></div>
+          <div class="snapshot-metric"><strong id="landing-training-cases">32</strong><span>labeled cases</span></div>
+          <div class="snapshot-metric"><strong id="landing-baseline-dice">0.599</strong><span>baseline mean Dice</span></div>
+          <div class="snapshot-status"><i id="landing-status-dot"></i><span id="landing-live-status">Checking backend status…</span></div>
+          <a href="/dashboard.html">View dashboard <span aria-hidden="true">→</span></a>
+        </div>
       </section>
 
       <section class="section problem" id="challenge"><div class="container"><div class="section-title challenge-title"><p class="eyebrow dark"><i></i> THE PROBLEM · THE RESPONSE</p><h2>One finding. Several views.<br />A lot to keep in mind.</h2><p>Prostate MRI review means comparing sequences, tracking a region across slices, and turning observations into a clear clinical impression.</p></div><div class="challenge-grid"><article class="challenge-card"><span class="card-index">01 / THE CHALLENGE</span><h3>Context gets fragmented</h3><p>Sequence views, lesion notes, anatomy, and review decisions can live in different places. That makes it harder to keep the whole case in view.</p><ul><li>Compare T2, diffusion, and ADC findings</li><li>Stay oriented across slice positions</li><li>Record why a region needs attention</li></ul></article><div class="challenge-connector">↓</div><article class="challenge-card solution-card"><span class="card-index">02 / THE MRI-RADAI APPROACH</span><h3>Keep the review connected</h3><p>MRI-RadAI brings case context, illustrative slice and anatomy views, sample findings, and clinician review actions together in one workspace concept.</p><ul><li>Inspect a finding beside its slice context</li><li>Relate markers to a prostate anatomy model</li><li>Capture review feedback and export a summary</li></ul></article></div><p class="section-caveat">The current experience is a research prototype using bundled sample cases and synthetic viewer imagery.</p></div></section>
@@ -81,11 +88,11 @@
         <details><summary>Can this be used for patient care?<span>⌄</span></summary><p>No. This prototype is not a diagnostic device and its sample content must not be used for patient care. Clinical decisions require qualified review of original imaging and patient context.</p></details>
       </div></div></section>
 
-      <section class="final-cta"><div class="container final-inner"><div><p class="eyebrow"><i></i> TAKE A CLOSER LOOK</p><h2>Explore the workflow.<br /><em>See the case in context.</em></h2><p>Try the sample experience and move through the review workspace at your own pace.</p></div><button class="button button-light" data-demo>Open the sample case <span>→</span></button><div class="orbit"></div></div></section>
+      <section class="final-cta"><div class="container final-inner"><div><p class="eyebrow"><i></i> TAKE A CLOSER LOOK</p><h2>Explore the workflow.<br /><em>See the case in context.</em></h2><p>Open the research dashboard for the latest project status and model baseline.</p></div><a class="button button-light" href="/dashboard.html">Open the dashboard <span>→</span></a><div class="orbit"></div></div></section>
     </main>
 
     <footer class="footer"><div class="container"><span>◇ &nbsp; RESEARCH PROTOTYPE</span><p>MRI-RadAI uses sample data and synthetic viewer graphics. The research workspace can submit PNG/JPEG images to NVIDIA's hosted vision API when configured. Not for clinical use or patient care.</p><a href="#top">Back to top ↑</a></div></footer>
-    <dialog class="demo-dialog"><button class="dialog-close" aria-label="Close">×</button><p class="eyebrow dark"><i></i> RESEARCH WORKSPACE</p><h2>Explore an image.</h2><p>Open the local upload flow to submit up to three PNG or JPEG images for a limited visual description. The result is not a diagnosis.</p><a class="button button-primary" href="/app.html">Open workspace <span>→</span></a></dialog>
+    <dialog class="demo-dialog"><button class="dialog-close" aria-label="Close">×</button><p class="eyebrow dark"><i></i> RESEARCH WORKSPACE</p><h2>Explore the workspace.</h2><p>See research status and baseline metrics, then open the technical review or anatomy segmentation workflow.</p><a class="button button-primary" href="/dashboard.html">Open dashboard <span>→</span></a></dialog>
     <script type="module" src="/landing.js"></script>
   </body>
 </html>

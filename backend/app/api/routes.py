@@ -82,6 +82,72 @@ def health() -> dict[str, str]:
         }
 
 
+@router.get("/api/v1/dashboard/stats")
+def dashboard_stats() -> dict[str, Any]:
+    """Return research dataset/model metadata and database-backed activity counts."""
+    settings = get_settings()
+    database_status = "error"
+    activity: dict[str, int | None] = {
+        "image_reviews": None,
+        "completed_image_reviews": None,
+        "zone_jobs": None,
+        "completed_zone_jobs": None,
+    }
+    try:
+        uploads().database.command("ping")
+        activity = {
+            "image_reviews": analyses().count_documents({}),
+            "completed_image_reviews": analyses().count_documents(
+                {"status": "completed"}
+            ),
+            "zone_jobs": zone_segmentations().count_documents({}),
+            "completed_zone_jobs": zone_segmentations().count_documents(
+                {"status": "completed"}
+            ),
+        }
+        database_status = "ok"
+    except PyMongoError:
+        pass
+
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "system": {
+            "api": "ok",
+            "database": database_status,
+            "image_quality_model": (
+                "configured" if settings.nvidia_api_key else "not_configured"
+            ),
+            "zone_model": zone_model_status(settings),
+        },
+        "dataset": {
+            "name": "MSD Task05 Prostate",
+            "training_cases": 32,
+            "challenge_cases": 16,
+            "modalities": ["T2", "ADC"],
+            "classes": {"1": "Peripheral zone (PZ)", "2": "Transition zone (TZ)"},
+        },
+        "baseline": {
+            "model": "2D U-Net",
+            "epochs": 8,
+            "train_cases": 26,
+            "validation_cases": 6,
+            "dice": {"pz": 0.485, "tz": 0.714, "mean": 0.599},
+            "history": [
+                {"epoch": 1, "pz": 0.312, "tz": 0.526, "mean": 0.419},
+                {"epoch": 2, "pz": 0.070, "tz": 0.346, "mean": 0.208},
+                {"epoch": 3, "pz": 0.274, "tz": 0.499, "mean": 0.387},
+                {"epoch": 4, "pz": 0.360, "tz": 0.561, "mean": 0.460},
+                {"epoch": 5, "pz": 0.353, "tz": 0.639, "mean": 0.496},
+                {"epoch": 6, "pz": 0.441, "tz": 0.625, "mean": 0.533},
+                {"epoch": 7, "pz": 0.407, "tz": 0.683, "mean": 0.545},
+                {"epoch": 8, "pz": 0.485, "tz": 0.714, "mean": 0.599},
+            ],
+            "note": "Small patient-level validation split. Research baseline only; not clinical validation.",
+        },
+        "activity": activity,
+    }
+
+
 @router.post("/api/v1/uploads", response_model=UploadResponse, status_code=201)
 async def create_upload(
     response: Response,

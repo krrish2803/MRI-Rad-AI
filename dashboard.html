@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1918" />
+    <meta name="description" content="MRI-RadAI research dashboard with live service status, dataset information, and baseline training metrics." />
+    <title>MRI-RadAI · Research dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/dashboard.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <header class="dashboard-nav">
+        <a class="dashboard-brand" href="/" aria-label="MRI-RadAI home">
+          <span class="brand-mark">M</span>
+          <span><strong>MRI-RadAI</strong><small>RESEARCH WORKSPACE</small></span>
+        </a>
+        <nav aria-label="Dashboard navigation">
+          <a class="nav-current" href="/dashboard.html" aria-current="page">Overview</a>
+          <a href="/app.html#zone-title">Zone segmentation</a>
+          <a href="/app.html#quality-title">Image quality</a>
+        </nav>
+        <a class="nav-action" href="/app.html">Open analysis workspace <span aria-hidden="true">↗</span></a>
+      </header>
+
+      <main>
+        <section class="dashboard-heading">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> RESEARCH PROTOTYPE · LIVE OVERVIEW</p>
+            <h1>Workspace <em>dashboard</em></h1>
+            <p class="heading-copy">Dataset, baseline results, and service readiness in one place.</p>
+          </div>
+          <div class="heading-actions">
+            <span id="last-updated" class="updated-at">Loading status…</span>
+            <button id="refresh-dashboard" class="refresh-button" type="button" aria-label="Refresh dashboard data">↻ <span>Refresh</span></button>
+          </div>
+        </section>
+
+        <section class="status-panel" aria-labelledby="status-heading">
+          <div class="section-heading compact-heading">
+            <div><p class="section-kicker">SYSTEM READINESS</p><h2 id="status-heading">Connected services</h2></div>
+            <span id="connection-label" class="connection-label"><i></i> Checking backend</span>
+          </div>
+          <div class="service-grid" aria-live="polite">
+            <article class="service-card" data-service-card="api">
+              <span class="service-icon">API</span><div><small>BACKEND API</small><strong id="service-api">Checking</strong><span id="service-api-note">Waiting for response</span></div><i class="service-dot" id="dot-api"></i>
+            </article>
+            <article class="service-card" data-service-card="database">
+              <span class="service-icon">DB</span><div><small>DATABASE</small><strong id="service-database">Checking</strong><span id="service-database-note">Activity counts</span></div><i class="service-dot" id="dot-database"></i>
+            </article>
+            <article class="service-card" data-service-card="image_quality_model">
+              <span class="service-icon">VLM</span><div><small>IMAGE QUALITY</small><strong id="service-image-quality-model">Checking</strong><span>Hosted vision service</span></div><i class="service-dot" id="dot-image_quality_model"></i>
+            </article>
+            <article class="service-card" data-service-card="zone_model">
+              <span class="service-icon">3D</span><div><small>ZONE SEGMENTATION</small><strong id="service-zone-model">Checking</strong><span>nnU-Net v2 · 5 folds</span></div><i class="service-dot" id="dot-zone_model"></i>
+            </article>
+          </div>
+        </section>
+
+        <section class="metrics-grid" aria-label="Research summary statistics">
+          <article class="metric-card metric-dataset"><div class="metric-top"><span>TRAINING DATA</span><span class="metric-symbol">▦</span></div><strong id="training-cases">32</strong><p>labeled Task05 cases</p><small>T2 + ADC · PZ/TZ zone masks</small></article>
+          <article class="metric-card"><div class="metric-top"><span>CHALLENGE SET</span><span class="metric-symbol">◌</span></div><strong id="challenge-cases">16</strong><p>unlabeled test cases</p><small>No public reference masks</small></article>
+          <article class="metric-card metric-dice"><div class="metric-top"><span>BASELINE MEAN DICE</span><span class="metric-symbol">⌁</span></div><strong id="mean-dice">0.599</strong><p>2D U-Net · 6-case validation split</p><small>Research baseline, not nnU-Net</small></article>
+          <article class="metric-card metric-activity"><div class="metric-top"><span>COMPLETED REVIEWS</span><span class="metric-symbol">◷</span></div><strong id="completed-reviews">—</strong><p id="review-count-note">Live count from database</p><small id="completed-zone-jobs">Zone jobs: —</small></article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel chart-panel">
+            <div class="section-heading">
+              <div><p class="section-kicker">MODEL EXPERIMENT</p><h2>Baseline validation by epoch</h2><p class="panel-subtitle">Patient-level split · 26 train / 6 validate · 8 epochs</p></div>
+              <span class="model-tag">2D U-Net</span>
+            </div>
+            <div class="chart-wrap">
+              <svg id="training-chart" viewBox="0 0 720 290" role="img" aria-label="Line chart showing PZ, TZ, and mean validation Dice over eight epochs"></svg>
+            </div>
+            <div class="chart-legend" aria-label="Chart legend">
+              <span><i class="legend-pz"></i> PZ Dice</span><span><i class="legend-tz"></i> TZ Dice</span><span><i class="legend-mean"></i> Mean Dice</span>
+            </div>
+            <p class="chart-footnote">Dice values are from the small baseline experiment in this repository. They are not clinical validation or five-fold nnU-Net results.</p>
+          </article>
+
+          <aside class="panel results-panel">
+            <div class="section-heading"><div><p class="section-kicker">BEST BASELINE EPOCH</p><h2>Epoch 8 results</h2></div><span class="result-medal">✳</span></div>
+            <div class="score-row"><div><span>Peripheral zone</span><small>PZ</small></div><strong id="pz-dice">0.485</strong></div>
+            <div class="score-track"><i class="track-pz" style="width:48.5%"></i></div>
+            <div class="score-row"><div><span>Transition zone</span><small>TZ</small></div><strong id="tz-dice">0.714</strong></div>
+            <div class="score-track"><i class="track-tz" style="width:71.4%"></i></div>
+            <div class="score-row mean-row"><div><span>Mean of zones</span><small>MEAN</small></div><strong id="baseline-mean-score">0.599</strong></div>
+            <div class="result-divider"></div>
+            <p class="result-note"><b>What this means</b><br />A preliminary 2D slice-based anatomy segmentation baseline. The production inference route is designed for a separate 3D nnU-Net model.</p>
+            <a class="text-action" href="/app.html#zone-title">Go to zone workflow <span aria-hidden="true">→</span></a>
+          </aside>
+        </section>
+
+        <section class="workflow-row">
+          <article class="workflow-card">
+            <div class="workflow-mark zone-mark">01</div><div><p class="section-kicker">ANATOMY MASK</p><h2>Run zone segmentation</h2><p>Submit a geometry-matched T2 and ADC NIfTI pair to generate a PZ/TZ mask.</p><a href="/app.html#zone-title">Open segmentation workflow <span aria-hidden="true">↗</span></a></div>
+          </article>
+          <article class="workflow-card">
+            <div class="workflow-mark quality-mark">02</div><div><p class="section-kicker">TECHNICAL REVIEW</p><h2>Check image quality</h2><p>Review technical observations about artifacts, contrast, field of view, and coverage.</p><a href="/app.html#quality-title">Open image-quality workflow <span aria-hidden="true">↗</span></a></div>
+          </article>
+        </section>
+      </main>
+
+      <footer class="dashboard-footer"><span>MRI-RADAI · RESEARCH ONLY</span><p>Anatomy segmentation only. No cancer, lesion, PI-RADS, or treatment predictions. Not for clinical use.</p><a href="/">Back to landing page ↑</a></footer>
+    </div>
+    <script type="module" src="/dashboard.js"></script>
+  </body>
+</html>
